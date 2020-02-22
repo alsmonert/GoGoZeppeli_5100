@@ -95,7 +95,10 @@ public class Lab7 {
         // find user with Most Likes
         helper.userWithMostLikes();
         
-        //helper.getFiveMostLikedComment();
+        helper.getFiveMostLikedComment();
         helper.getPostWithMostComments();
+        helper.getFiveMostInactiveUserBasedOnPost();
+
+        
     }
 }

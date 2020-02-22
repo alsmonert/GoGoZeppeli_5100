@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import lab7.entities.Comment;
@@ -51,31 +52,21 @@ public class AnalysisHelper {
     
     
     public void getPostWithMostComments(){
-        Map<Integer, Integer>commentCount = new HashMap<>();
         Map<Integer, Post>post = DataStore.getInstance().getPosts();
+        List<Post>commentCount = new ArrayList<Post>(post.values());
         
-        
-        for(Post p : post.values()){
-            
-                int comments = 0;
-                if (commentCount.containsKey(p.getPostId())) {
-                    comments = commentCount.get(p.getComments().size());
-                }
-                comments += p.getComments().size();
-                commentCount.put(p.getPostId(), comments);
-        }
-        
-        int max = 0;
-        int maxId = 0;
-        for (int id : commentCount.keySet()) {
-            if (commentCount.get(id) > max) {
-                max = commentCount.get(id);
-                maxId = id;
+        Collections.sort(commentCount, new Comparator<Post>() {
+            @Override 
+            public int compare(Post p1, Post p2) {
+                return p2.getComments().size() - p1.getComments().size();
             }
-        }
+        });
         
-        System.out.print("Post with most comments: " + max + "\n" 
-            + post.get(maxId));
+        
+        System.out.print("The post id with most comments: " + commentCount.get(0).getPostId() + "\n" 
+            + commentCount.get(0)+ "\n");
+        
+        
     }
     
     
@@ -97,23 +88,40 @@ public class AnalysisHelper {
             System.out.println(commentList.get(i));
         }
     }
+
+    
+    public int postCount(User u){
+        LinkedHashSet<Integer> postIDset = new LinkedHashSet<>();
+        List<Integer> postIDs = new ArrayList<>();
+        int likescount = 0;
+        for (Comment c : u.getComments()){
+            likescount += c.getLikes();
+            postIDs.add(c.getPostId());
+        }
+        postIDset.addAll(postIDs); 
+        int postcount = postIDset.size();
+        return postcount;
+    }
     
     
     public void getFiveMostInactiveUserBasedOnPost() {
-        Map<Integer, Comment> comments = DataStore.getInstance().getComments();
-        List<Comment> commentList = new ArrayList<>(comments.values());
-        
-        Collections.sort(commentList, new Comparator<Comment>() {
+
+        Map<Integer, User> users = DataStore.getInstance().getUsers();
+        List<User> userList = new ArrayList<>(users.values());
+
+        Collections.sort(userList, new Comparator<User>() {
             @Override 
-            public int compare(Comment o1, Comment o2) {
-                return o2.getLikes() - o1.getLikes();
+            public int compare(User u1, User u2) {
+                return postCount(u1) - postCount(u2);
             }
         });
-        
-        System.out.println("5 most likes comments: ");
-        for (int i = 0; i < commentList.size() && i < 5; i++) {
-            System.out.println(commentList.get(i));
+        System.out.println("5 least-post users: ");
+        for (int i = 0; i < userList.size() && i < 5; i++) {
+            System.out.println(userList.get(i));
         }
+        
     }
+
+    
     
 }
