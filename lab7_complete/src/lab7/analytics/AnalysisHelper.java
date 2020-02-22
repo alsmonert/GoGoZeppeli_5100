@@ -52,32 +52,30 @@ public class AnalysisHelper {
     
     public void getPostWithMostComments(){
         Map<Integer, Integer>commentCount = new HashMap<>();
-        Map<Integer, Post>postMap = DataStore.getInstance().getPosts();
-        Map<Integer, Comment> commentMap = DataStore.getInstance().getComments();
+        Map<Integer, Post>post = DataStore.getInstance().getPosts();
         
         
-        for(Post p : postMap.values()){
+        for(Post p : post.values()){
             
-                if(commentCount.containsKey(p.getPostId())){
-                    int commentNum = commentCount.get(p.getPostId()) + p.getComments().size();
-                    commentCount.put(p.getPostId(), commentNum);
+                int comments = 0;
+                if (commentCount.containsKey(p.getPostId())) {
+                    comments = commentCount.get(p.getComments().size());
                 }
-                else{
-                    commentCount.put(p.getPostId(), p.getComments().size());
-                }
-            
+                comments += p.getComments().size();
+                commentCount.put(p.getPostId(), comments);
         }
         
-        int win = 0;
-        int maxComments = 0;
-        for(Integer i : commentCount.keySet()){
-            if(maxComments < commentCount.get(i)){
-                win = i;
-                maxComments = commentCount.get(i);
+        int max = 0;
+        int maxId = 0;
+        for (int id : commentCount.keySet()) {
+            if (commentCount.get(id) > max) {
+                max = commentCount.get(id);
+                maxId = id;
             }
         }
         
-        System.out.print("The post with maximum comments is " + win + "The maximun number of comments is " + maxComments + "\n");
+        System.out.print("Post with most comments: " + max + "\n" 
+            + post.get(maxId));
     }
     
     
@@ -100,5 +98,22 @@ public class AnalysisHelper {
         }
     }
     
+    
+    public void getFiveMostInactiveUserBasedOnPost() {
+        Map<Integer, Comment> comments = DataStore.getInstance().getComments();
+        List<Comment> commentList = new ArrayList<>(comments.values());
+        
+        Collections.sort(commentList, new Comparator<Comment>() {
+            @Override 
+            public int compare(Comment o1, Comment o2) {
+                return o2.getLikes() - o1.getLikes();
+            }
+        });
+        
+        System.out.println("5 most likes comments: ");
+        for (int i = 0; i < commentList.size() && i < 5; i++) {
+            System.out.println(commentList.get(i));
+        }
+    }
     
 }
