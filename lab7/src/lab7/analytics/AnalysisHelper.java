@@ -86,7 +86,18 @@ public class AnalysisHelper {
         
     }
     
-         
+    public int overall(User u){
+        LinkedHashSet<Integer> postIDset = new LinkedHashSet<>();
+        List<Integer> postIDs = new ArrayList<>();
+        int likescount = 0;
+        for (Comment c : u.getComments()){
+            likescount += c.getLikes();
+            postIDs.add(c.getPostId());
+        }
+        postIDset.addAll(postIDs); 
+        int postcount = postIDset.size();
+        return postcount+likescount+u.getComments().size();
+    }        
     public void getFiveInactiveUserOverall(){
         Map<Integer, User> users = DataStore.getInstance().getUsers();
         List<User> userList = new ArrayList<>(users.values());
